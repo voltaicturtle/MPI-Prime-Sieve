@@ -12,7 +12,11 @@ uncomment the #pragma line in the sieve method<br>
 remember to add -fopenmp to the compile line<br>
 </p>
 <p>Command line to compile and run:<br>
-> mpicxx -Wall -Werror -std=c++23 -O3 mpiParPrimeSieve.cc -o mpi<br>
+```
+mpicxx -Wall -Werror -std=c++23 -O3 mpiParPrimeSieve.cc -o mpi
+```
 and then to run:<br>
-> mpirun --oversubscribe -n (number of processes) -hostfile ./Hosts.txt ./mpi<br>
+```
+mpirun --oversubscribe -n (number of processes) -hostfile ./Hosts.txt ./mpi
+```
 </p>
