@@ -3,7 +3,7 @@
 <p>A Prime Sieve using distributed memory in C++ <br>
 </p>
 <p>Make sure you have MPI installed on your systems.<br>
-Make sure your "Hosts.txt" has all of your systme names each followed by a return<br>
+Make sure your "Hosts.txt" has all of your system names each followed by a return<br>
 </p>
 <p>If you would ever want change the serial function to use openmp<br>
 have open mp on your system<br>
