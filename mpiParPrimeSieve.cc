@@ -45,8 +45,10 @@ parSeive(unsigned long myRank, unsigned long commSz, unsigned long n)
                 for (unsigned long j = skip * skip; j < length; j += skip)
                     v[j] = false;
             }
+
             ++skip;
         }
+
         //tells the other processes that we found the end and break out
         //the program will hang without this
         MPI_Bcast(&skip, 1, MPI_UNSIGNED_LONG, 0, MPI_COMM_WORLD);
@@ -65,7 +67,7 @@ parSeive(unsigned long myRank, unsigned long commSz, unsigned long n)
                 break;
 
             //calculates the starting point based on where our start point is
-            auto startingPoint = (start % skip ? skip - (start%skip) : 0);
+            auto startingPoint = (start % skip ? skip - (start % skip) : 0);
 
             //marks off all of the non prime numbers
             for (unsigned long j = startingPoint; j < length; j += skip)
@@ -75,10 +77,10 @@ parSeive(unsigned long myRank, unsigned long commSz, unsigned long n)
 
     //counts all of the primes and returns
     unsigned long count = 0;
+
     for (unsigned long i = 0; i < v.size(); ++i)
-    {
         count += v[i];
-    }
+
     return count;
 }
 
@@ -86,6 +88,7 @@ unsigned long
 seive(unsigned long n)
 {
     std::vector<bool> primes(n, true);
+
     //sets 0 and 1 to false
     primes[0] = false;
     primes[1] = false;
@@ -93,14 +96,16 @@ seive(unsigned long n)
     for (unsigned long i = 2; i * i < n; ++i) 
     {
         if (primes[i])
-        //uncomment below block if you want to use open mp
+        //uncomment below block and the include if you want to use open mp
         //#pragma omp parallel for num_threads(4)
             for (unsigned long j = i * i; j < n; j += i)
                 primes[j] = false;
     }
+
     unsigned long count= 0;
     for (unsigned long i = 0; i < primes.size(); ++i)
         count += primes[i];
+
     return count;
 }
 
@@ -109,8 +114,10 @@ main()
 {
     //mpi settup
     MPI_Init(nullptr, nullptr);
+    
     int myRank = 0;
     MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
+
     int commSz = 0;
     MPI_Comm_size(MPI_COMM_WORLD, &commSz);
 
@@ -120,6 +127,7 @@ main()
         std::cout << "n ==> ";
         std::cin >> n;
         std::cout << "\n";
+
         if (commSz * commSz > n)
         {
             std::cout << "Please input a lower number of processes or higher n.\n";
@@ -132,7 +140,6 @@ main()
     double t1 = MPI_Wtime();
     MPI_Bcast(&n, 1, MPI_UNSIGNED_LONG, 0, MPI_COMM_WORLD);
 
-    //do the sort and report count
     auto countPar = parSeive(myRank, commSz, n);
     
     //collects the counts of all of the processes
@@ -141,16 +148,19 @@ main()
     
     double t2 = MPI_Wtime();
 
-    // prints and calculates the serial times on source process
+    //prints and calculates the serial times on source process
     if (myRank == 0)
     {
         std::cout << "Parallel Count: " << total << "\n"; 
         std::cout << "Parallel Time:  " << t2 - t1 << " Seconds\n\n";
         auto time = MPI_Wtime();
+        
         auto verify = seive(n);
+        
         time = MPI_Wtime() - time;
         std::cout << "Serial Count: " << verify << "\n";
         std::cout << "Serial Time:  " << time << " Seconds\n";    
     }
+
     MPI_Finalize();
 }
