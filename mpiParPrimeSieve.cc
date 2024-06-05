@@ -39,10 +39,7 @@ parSeive(unsigned long myRank, unsigned long commSz, unsigned long n)
             if (v[skip])
             {
                 //tells all of the other processes
-                for (unsigned i = 1; i < commSz; ++i) 
-                {
-                    MPI_Send(&skip, 1, MPI_UNSIGNED_LONG, i, 0, MPI_COMM_WORLD);
-                }
+                MPI_Bcast(&skip, 1, MPI_UNSIGNED_LONG, 0, MPI_COMM_WORLD);
 
                 //marks off all the non primes
                 for (unsigned long j = skip * skip; j < length; j += skip)
@@ -52,8 +49,7 @@ parSeive(unsigned long myRank, unsigned long commSz, unsigned long n)
         }
         //tells the other processes that we found the end and break out
         //the program will hang without this
-        for (unsigned i = 1; i < commSz; ++i) 
-            MPI_Send(&skip, 1, MPI_UNSIGNED_LONG, i, 0, MPI_COMM_WORLD);
+        MPI_Bcast(&skip, 1, MPI_UNSIGNED_LONG, 0, MPI_COMM_WORLD);
     }
 
     // if any other process
@@ -62,8 +58,8 @@ parSeive(unsigned long myRank, unsigned long commSz, unsigned long n)
         while (skip * skip < n) 
         {
             //waits to recieve what number to skip by
-            MPI_Recv(&skip, 1, MPI_UNSIGNED_LONG, 0, 0, MPI_COMM_WORLD, nullptr);
-
+            MPI_Bcast(&skip, 1, MPI_UNSIGNED_LONG, 0, MPI_COMM_WORLD);
+            
             //breaks out of statement if the exit condition is met
             if (skip * skip > n)
                 break;
